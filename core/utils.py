@@ -125,6 +125,7 @@ def image_preprocess(image, target_size, gt_boxes=None):
         return image_paded, gt_boxes
 
 def draw_bbox(image, bboxes, classes=read_class_names(cfg.YOLO.CLASSES), show_label=True):
+    total_number = 0
     num_classes = len(classes)
     image_h, image_w, _ = image.shape
     hsv_tuples = [(1.0 * x / num_classes, 1., 1.) for x in range(num_classes)]
@@ -149,8 +150,7 @@ def draw_bbox(image, bboxes, classes=read_class_names(cfg.YOLO.CLASSES), show_la
         class_ind = int(out_classes[0][i])
         bbox_color = colors[class_ind]
         bbox_thick = int(0.6 * (image_h + image_w) / 600)
-        
-        c1, c2 = (int(coor[1]), int(coor[0])), (int(coor[3]), int(coor[2])
+        c1, c2 = (int(coor[1]), int(coor[0])), (int(coor[3]), int(coor[2]))
         #c1, c2 = (coor[1], coor[0]), (coor[3], coor[2])
         cv2.rectangle(image, c1, c2, bbox_color, bbox_thick)
 
@@ -158,17 +158,14 @@ def draw_bbox(image, bboxes, classes=read_class_names(cfg.YOLO.CLASSES), show_la
             bbox_mess = '%s: %.2f' % (classes[class_ind], score)
             t_size = cv2.getTextSize(bbox_mess, 0, fontScale, thickness=bbox_thick // 2)[0]
             c3 = (c1[0] + t_size[0], c1[1] - t_size[1] - 3)
-                                                
-            cv2.rectangle(image, c1, (int(np.float32(c3[0])), int(np.float32(c3[1]))), bbox_color, -1)                                    
-            # cv2.rectangle(image, c1, (np.float32(c3[0]), np.float32(c3[1])), bbox_color, -1) #filled
-            
-            cv2.putText(image, bbox_mess, (c1[0], int(np.float32(c1[1] - 2))), cv2.FONT_HERSHEY_SIMPLEX,
-                        fontScale, (0, 0, 0), bbox_thick // 2, lineType=cv2.LINE_AA)
-            #cv2.putText(image, bbox_mess, (c1[0], np.float32(c1[1] - 2)), cv2.FONT_HERSHEY_SIMPLEX,
-             #           fontScale, (0, 0, 0), bbox_thick // 2, lineType=cv2.LINE_AA)
-    total_number = i
-    cv2.putText(image, "Total Number:" + str(total_number), (20, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
+            #cv2.rectangle(image, c1, (np.float32(c3[0]), np.float32(c3[1])), bbox_color, -1) #filled
+            cv2.rectangle(image, c1, (int(np.float32(c3[0])), int(np.float32(c3[1]))), bbox_color, -1) #filled
 
+            cv2.putText(image, bbox_mess, (c1[0], int(np.float32(c1[1] - 2))), cv2.FONT_HERSHEY_SIMPLEX,
+            #cv2.putText(image, bbox_mess, (c1[0], np.float32(c1[1] - 2)), cv2.FONT_HERSHEY_SIMPLEX,
+                        fontScale, (0, 0, 0), bbox_thick // 2, lineType=cv2.LINE_AA)
+            total_number = i    
+    cv2.putText(image, "Total Number:" + str(total_number), (20, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
     return image
 
 def bbox_iou(bboxes1, bboxes2):
